@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { track } from "./analytics";
 
 const DC = {core:"#22c55e",business:"#3b82f6",personal:"#a855f7"};
 
@@ -499,7 +500,8 @@ const BUNDLES=[
 const initState=()=>{try{const s=JSON.parse(localStorage.getItem("aibos-state")||"null");if(s)return{...s,unlockedBundles:[...new Set(["free",...(s.unlockedBundles||[])])]}}catch{}return{unlockedBundles:["free"],completedFrameworks:[],userResponses:{},commitments:[]}};
 
 export default function App(){
-  const[tab,setTab]=useState("dashboard");
+  const[tab,_setTab]=useState("dashboard");
+  const setTab=(t:string)=>{track("tab_switch",{tab:t});_setTab(t)};
   const[state,setState]=useState(initState);
   const[activeF,setActiveF]=useState(null);
   const[stepIdx,setStepIdx]=useState(0);
@@ -526,19 +528,19 @@ export default function App(){
   const flatSteps=fw=>{const out=[];const p=steps=>{for(const s of steps){if(s.type==="branch"){const a=state.userResponses[fw.id]?.[s.sourceId];if(a&&s.branches[a])p(s.branches[a])}else out.push(s)}};p(fw.steps);return out};
   const setResp=(fid,sid,val)=>upd(p=>({...p,userResponses:{...p.userResponses,[fid]:{...(p.userResponses[fid]||{}),[sid]:val}}}));
   const addCommitment=(fid,txt)=>upd(p=>({...p,commitments:[...p.commitments,{frameworkId:fid,text:txt,date:new Date().toISOString().slice(0,10)}]}));
-  const completeF=fid=>upd(p=>({...p,completedFrameworks:[...new Set([...p.completedFrameworks,fid])]}));
-  const restartF=fid=>upd(p=>{const ur={...p.userResponses};delete ur[fid];return{...p,completedFrameworks:p.completedFrameworks.filter(x=>x!==fid),userResponses:ur}});
+  const completeF=fid=>{const fw=F.find(f=>f.id===fid);track("framework_completed",{framework_id:fid,framework_name:fw?.name||fid,domain:fw?.domain||"",author:fw?.author||""});upd(p=>({...p,completedFrameworks:[...new Set([...p.completedFrameworks,fid])]}));};
+  const restartF=fid=>{track("framework_restarted",{framework_id:fid});upd(p=>{const ur={...p.userResponses};delete ur[fid];return{...p,completedFrameworks:p.completedFrameworks.filter(x=>x!==fid),userResponses:ur}});};
 
-  const unlockCode=()=>{const c=code.trim().toUpperCase();if(CODES[c]){upd(p=>({...p,unlockedBundles:[...new Set([...p.unlockedBundles,...CODES[c]])]}));setToast("🎉 Unlocked!");setCode("");setCErr(false);setTimeout(()=>setToast(""),3000)}else{setCErr(true);setTimeout(()=>setCErr(false),1500)}};
+  const unlockCode=()=>{const c=code.trim().toUpperCase();if(CODES[c]){track("unlock_code_success",{code:c,bundles:CODES[c].join(",")});upd(p=>({...p,unlockedBundles:[...new Set([...p.unlockedBundles,...CODES[c]])]}));setToast("🎉 Unlocked!");setCode("");setCErr(false);setTimeout(()=>setToast(""),3000)}else{track("unlock_code_failed");setCErr(true);setTimeout(()=>setCErr(false),1500)}};
 
-  const openF=fw=>{if(!isUnlocked(fw)){setTab("store");return}if(isStub(fw))return;setActiveF(fw);const steps=flatSteps(fw);let resume=0;for(let i=0;i<steps.length;i++){const s=steps[i];if(s.type==="question"||s.type==="choice"){if(state.userResponses[fw.id]?.[s.id])resume=i+1;else break}else if(s.type==="template"){if(state.userResponses[fw.id]?.[s.id+"_field_0"])resume=i+1;else break}else resume=i}if(isComplete(fw))resume=0;setStepIdx(Math.min(resume,steps.length-1))};
+  const openF=fw=>{if(!isUnlocked(fw)){track("framework_locked_click",{framework_id:fw.id,framework_name:fw.name,domain:fw.domain});setTab("store");return}if(isStub(fw))return;track("framework_started",{framework_id:fw.id,framework_name:fw.name,domain:fw.domain,author:fw.author,is_free:fw.bundles.includes("free")});setActiveF(fw);const steps=flatSteps(fw);let resume=0;for(let i=0;i<steps.length;i++){const s=steps[i];if(s.type==="question"||s.type==="choice"){if(state.userResponses[fw.id]?.[s.id])resume=i+1;else break}else if(s.type==="template"){if(state.userResponses[fw.id]?.[s.id+"_field_0"])resume=i+1;else break}else resume=i}if(isComplete(fw))resume=0;setStepIdx(Math.min(resume,steps.length-1))};
 
   // ─── STEP RENDERER ───
   const renderStep=fw=>{
     const steps=flatSteps(fw),s=steps[stepIdx];if(!s)return null;
     const total=steps.length,isLast=stepIdx===total-1,fid=fw.id,col=DC[fw.domain],resp=state.userResponses[fid]||{};
     const canNext=()=>{if(s.type==="info"||s.type==="reflection"||s.type==="action")return true;if(s.type==="question")return!!resp[s.id]?.trim();if(s.type==="choice")return!!resp[s.id];if(s.type==="template")return s.fields.some((_,i)=>resp[s.id+"_field_"+i]?.trim());return true};
-    const goNext=()=>{if(s.type==="action"&&s.isCommitment)addCommitment(fid,resolve(s.text,fid));if(isLast){completeF(fid);setActiveF(null);return}setStepIdx(stepIdx+1)};
+    const goNext=()=>{track("step_completed",{framework_id:fid,step_id:s.id,step_type:s.type,step_number:stepIdx+1,total_steps:total});if(s.type==="action"&&s.isCommitment)addCommitment(fid,resolve(s.text,fid));if(isLast){completeF(fid);setActiveF(null);return}setStepIdx(stepIdx+1)};
     const maxW=desk?640:480;
     return(
       <div style={{display:"flex",flexDirection:"column",height:"100%",maxWidth:maxW,margin:"0 auto",width:"100%"}}>
@@ -644,7 +646,7 @@ export default function App(){
       {BUNDLES.filter(b=>b.highlight).map(b=><div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:desk?20:16,marginBottom:16,border:"2px solid #f59e0b"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3 style={{color:"#f59e0b",margin:0,fontSize:desk?20:17}}>⭐ {b.name}</h3><span style={{color:"#f59e0b",fontWeight:800,fontSize:desk?26:22}}>${b.price}</span></div>
         <p style={{color:"#cbd5e1",fontSize:14,margin:"8px 0 12px"}}>{b.desc}</p>
-        <a href={b.url} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",padding:"12px 32px",borderRadius:8,background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:14,textDecoration:"none"}}>Buy on Beehiiv →</a>
+        <a href={b.url} target="_blank" rel="noopener noreferrer" onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})} style={{display:"inline-block",padding:"12px 32px",borderRadius:8,background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:14,textDecoration:"none"}}>Buy on Beehiiv →</a>
       </div>)}
       <h3 style={{color:"#94a3b8",fontSize:13,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Domain Bundles</h3>
       <div style={{display:"grid",gridTemplateColumns:desk?"1fr 1fr":"1fr",gap:10,marginBottom:20}}>
@@ -652,7 +654,7 @@ export default function App(){
           <div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:14,border:`1px solid ${b.color}44`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:b.color,margin:0,fontSize:15}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:b.color,fontWeight:700}}>${b.price}</span></div>
             <p style={{color:"#94a3b8",fontSize:12,margin:"4px 0 8px"}}>{b.desc}</p>
-            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" style={{color:b.color,fontSize:13,fontWeight:600,textDecoration:"none"}}>Buy on Beehiiv →</a>}
+            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})} style={{color:b.color,fontSize:13,fontWeight:600,textDecoration:"none"}}>Buy on Beehiiv →</a>}
           </div>)})}
       </div>
       <h3 style={{color:"#94a3b8",fontSize:13,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Author Packs</h3>
@@ -661,7 +663,7 @@ export default function App(){
           <div key={b.id} style={{background:"#1e293b",borderRadius:10,padding:14,border:"1px solid #334155"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:"#f1f5f9",margin:0,fontSize:14}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:"#f59e0b",fontWeight:700,fontSize:14}}>${b.price}</span></div>
             <p style={{color:"#94a3b8",fontSize:12,margin:"4px 0 6px"}}>{b.desc}</p>
-            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" style={{color:"#f59e0b",fontSize:12,fontWeight:600,textDecoration:"none"}}>Buy →</a>}
+            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})} style={{color:"#f59e0b",fontSize:12,fontWeight:600,textDecoration:"none"}}>Buy →</a>}
           </div>)})}
       </div>
     </div>
@@ -678,7 +680,7 @@ export default function App(){
         {["Describe your situation in plain language","Get matched to the right framework","Receive analysis — Hormozi, TOC, or Dickens","Walk away with a concrete action plan"].map((t,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:8}}><span style={{color:"#a855f7",flexShrink:0}}>→</span><span style={{color:"#cbd5e1",fontSize:13,lineHeight:1.5}}>{t}</span></div>)}
         <p style={{color:"#94a3b8",fontSize:12,margin:"12px 0 8px"}}>Drop your email for early access.</p>
         <input value={waitEmail} onChange={e=>setWaitEmail(e.target.value)} placeholder="your@email.com" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>
-        <button onClick={()=>{if(waitEmail.includes("@")){setToast("🎉 You're on the early access list!");setWaitEmail("")}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:"#a855f7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Get Early Access</button>
+        <button onClick={()=>{if(waitEmail.includes("@")){track("waitlist_signup");setToast("🎉 You're on the early access list!");setWaitEmail("")}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:"#a855f7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Get Early Access</button>
       </div>
     </div>
   );
