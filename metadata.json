@@ -1,0 +1,7 @@
+{
+  "name": "NanoEdit Studio",
+  "description": "A powerful AI image editing and generation tool powered by Gemini 2.5 Flash Image (Nano Banana). Upload images to edit them with natural language or generate new ones from scratch.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
