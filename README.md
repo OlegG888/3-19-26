@@ -1,20 +1,28 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+
+# AIBOS Coach 🏴‍☠️
+
+**You know what to do. This helps you do it.**
+
+An interactive AI coaching app with 26+ frameworks from Hormozi, Robbins, Kennedy, Brunson, Sullivan, and more.
+
 </div>
 
-# Run and deploy your AI Studio app
+## Features
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1qiwVjNZ0N07Fa51iF2JcOiEafeaoOomo
+- 26 fully interactive coaching frameworks (6 free + 20 premium)
+- Branching logic adapts to your answers
+- Progress tracking with localStorage persistence
+- Framework store with unlock codes
+- Mobile-first responsive design
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js
 
+1. Install dependencies: `npm install`
+2. Run the app: `npm run dev`
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## View in AI Studio
+
+View your app in AI Studio: https://ai.studio/apps/drive/1qiwVjNZ0N07Fa51iF2JcOiEafeaoOomo

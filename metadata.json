@@ -1,7 +1,4 @@
 {
-  "name": "NanoEdit Studio",
-  "description": "A powerful AI image editing and generation tool powered by Gemini 2.5 Flash Image (Nano Banana). Upload images to edit them with natural language or generate new ones from scratch.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "name": "AIBOS Coach",
+  "description": "An interactive AI coaching app with 26 frameworks from Hormozi, Robbins, Kennedy, Brunson, Sullivan, and more. Guided self-coaching with branching logic, progress tracking, and a framework store."
 }
