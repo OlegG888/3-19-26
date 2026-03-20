@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { track } from "./analytics";
+import { track, captureUser, saveUserProgress } from "./analytics";
 
 const DC = {core:"#22c55e",business:"#3b82f6",personal:"#a855f7"};
 
@@ -510,10 +510,12 @@ export default function App(){
   const[toast,setToast]=useState("");
   const[codeErr,setCErr]=useState(false);
   const[waitEmail,setWaitEmail]=useState("");
+  const[userEmail,setUserEmail]=useState<string|null>(null);
   const[w,setW]=useState(typeof window!=="undefined"?window.innerWidth:400);
   const scrollRef=useRef(null);
 
   useEffect(()=>{const h=()=>setW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
+  useEffect(()=>{captureUser().then(e=>{if(e)setUserEmail(e)})},[]);
 
   const desk=w>=768;
   const wide=w>=1024;
@@ -528,7 +530,7 @@ export default function App(){
   const flatSteps=fw=>{const out=[];const p=steps=>{for(const s of steps){if(s.type==="branch"){const a=state.userResponses[fw.id]?.[s.sourceId];if(a&&s.branches[a])p(s.branches[a])}else out.push(s)}};p(fw.steps);return out};
   const setResp=(fid,sid,val)=>upd(p=>({...p,userResponses:{...p.userResponses,[fid]:{...(p.userResponses[fid]||{}),[sid]:val}}}));
   const addCommitment=(fid,txt)=>upd(p=>({...p,commitments:[...p.commitments,{frameworkId:fid,text:txt,date:new Date().toISOString().slice(0,10)}]}));
-  const completeF=fid=>{const fw=F.find(f=>f.id===fid);track("framework_completed",{framework_id:fid,framework_name:fw?.name||fid,domain:fw?.domain||"",author:fw?.author||""});upd(p=>({...p,completedFrameworks:[...new Set([...p.completedFrameworks,fid])]}));};
+  const completeF=fid=>{const fw=F.find(f=>f.id===fid);track("framework_completed",{framework_id:fid,framework_name:fw?.name||fid,domain:fw?.domain||"",author:fw?.author||""});if(userEmail)saveUserProgress(userEmail,fid,fw?.name||fid);upd(p=>({...p,completedFrameworks:[...new Set([...p.completedFrameworks,fid])]}));};
   const restartF=fid=>{track("framework_restarted",{framework_id:fid});upd(p=>{const ur={...p.userResponses};delete ur[fid];return{...p,completedFrameworks:p.completedFrameworks.filter(x=>x!==fid),userResponses:ur}});};
 
   const unlockCode=()=>{const c=code.trim().toUpperCase();if(CODES[c]){track("unlock_code_success",{code:c,bundles:CODES[c].join(",")});upd(p=>({...p,unlockedBundles:[...new Set([...p.unlockedBundles,...CODES[c]])]}));setToast("🎉 Unlocked!");setCode("");setCErr(false);setTimeout(()=>setToast(""),3000)}else{track("unlock_code_failed");setCErr(true);setTimeout(()=>setCErr(false),1500)}};
