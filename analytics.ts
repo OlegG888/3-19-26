@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent as fbLogEvent, setUserProperties, setUserId, Analytics } from "firebase/analytics";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, Firestore } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARXmL7UNm7CZVZFdxz80b4WQz7IIMCO3s",
@@ -108,6 +108,21 @@ export async function captureUser(): Promise<string | null> {
   }
 
   return email;
+}
+
+// Save waitlist signup to Firestore
+export async function saveWaitlist(email: string, type: "coach_chat" | "bundle_purchase", bundleId?: string, bundleName?: string) {
+  if (!db || !email) return;
+  try {
+    await addDoc(collection(db, "waitlist"), {
+      email,
+      type,
+      bundle_id: bundleId || null,
+      bundle_name: bundleName || null,
+      created_at: new Date().toISOString()
+    });
+    track("waitlist_signup", { email, type, bundle_id: bundleId || "", bundle_name: bundleName || "" });
+  } catch {}
 }
 
 // Save framework completion to user's Firestore record
