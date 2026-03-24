@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { track, captureUser, saveUserProgress, saveWaitlist } from "./analytics";
+import { track, captureUser, saveUserProgress, saveWaitlist, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, onAuthChange, loadUserBundles, loadUserProgress, saveUserState } from "./analytics";
 
 const DC = {core:"#22c55e",business:"#3b82f6",personal:"#a855f7"};
 
@@ -508,21 +508,56 @@ export default function App(){
   const[filter,setFilter]=useState("all");
   const[code,setCode]=useState("");
   const[toast,setToast]=useState("");
+  useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(""),3000);return()=>clearTimeout(t)}},[toast]);
   const[codeErr,setCErr]=useState(false);
   const[waitEmail,setWaitEmail]=useState("");
   const[buyEmail,setBuyEmail]=useState("");
   const[buyBundle,setBuyBundle]=useState<string|null>(null);
   const[userEmail,setUserEmail]=useState<string|null>(null);
+  const[userName,setUserName]=useState<string|null>(null);
+  const[userPhoto,setUserPhoto]=useState<string|null>(null);
+  const[authLoading,setAuthLoading]=useState(true);
+  const[authMode,setAuthMode]=useState<"login"|"signup">("login");
+  const[authEmail,setAuthEmail]=useState("");
+  const[authPass,setAuthPass]=useState("");
+  const[authName,setAuthName]=useState("");
+  const[authErr,setAuthErr]=useState("");
   const[w,setW]=useState(typeof window!=="undefined"?window.innerWidth:400);
   const scrollRef=useRef(null);
 
   useEffect(()=>{const h=()=>setW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h)},[]);
   useEffect(()=>{captureUser().then(e=>{if(e)setUserEmail(e)})},[]);
 
+  // Firebase Auth listener
+  useEffect(()=>{
+    const unsub=onAuthChange(async(user)=>{
+      if(user&&user.email){
+        setUserEmail(user.email);
+        setUserName(user.displayName);
+        setUserPhoto(user.photoURL);
+        // Load bundles and progress from Firestore
+        const bundles=await loadUserBundles(user.email);
+        const progress=await loadUserProgress(user.email);
+        setState(prev=>({
+          ...prev,
+          unlockedBundles:[...new Set(["free",...bundles,...prev.unlockedBundles])],
+          completedFrameworks:[...new Set([...progress.completedFrameworks,...prev.completedFrameworks])],
+          userResponses:{...progress.userResponses,...prev.userResponses},
+          commitments:[...progress.commitments,...prev.commitments.filter(c=>!progress.commitments.some(p=>p.date===c.date&&p.text===c.text))]
+        }));
+      }else{
+        setUserName(null);
+        setUserPhoto(null);
+      }
+      setAuthLoading(false);
+    });
+    return unsub;
+  },[]);
+
   const desk=w>=768;
   const wide=w>=1024;
 
-  const upd=useCallback(fn=>{setState(prev=>{const next=fn(prev);localStorage.setItem("aibos-state",JSON.stringify(next));return next})},[]);
+  const upd=useCallback(fn=>{setState(prev=>{const next=fn(prev);localStorage.setItem("aibos-state",JSON.stringify(next));if(userEmail)saveUserState(userEmail,next);return next})},[userEmail]);
   useEffect(()=>{if(scrollRef.current)scrollRef.current.scrollTop=0},[stepIdx,activeF]);
 
   const isUnlocked=fw=>fw.bundles.some(b=>state.unlockedBundles.includes(b));
@@ -535,7 +570,7 @@ export default function App(){
   const completeF=fid=>{const fw=F.find(f=>f.id===fid);track("framework_completed",{framework_id:fid,framework_name:fw?.name||fid,domain:fw?.domain||"",author:fw?.author||""});if(userEmail)saveUserProgress(userEmail,fid,fw?.name||fid);upd(p=>({...p,completedFrameworks:[...new Set([...p.completedFrameworks,fid])]}));};
   const restartF=fid=>{track("framework_restarted",{framework_id:fid});upd(p=>{const ur={...p.userResponses};delete ur[fid];return{...p,completedFrameworks:p.completedFrameworks.filter(x=>x!==fid),userResponses:ur}});};
 
-  const unlockCode=()=>{const c=code.trim().toUpperCase();if(CODES[c]){track("unlock_code_success",{code:c,bundles:CODES[c].join(",")});upd(p=>({...p,unlockedBundles:[...new Set([...p.unlockedBundles,...CODES[c]])]}));setToast("🎉 Unlocked!");setCode("");setCErr(false);setTimeout(()=>setToast(""),3000)}else{track("unlock_code_failed");setCErr(true);setTimeout(()=>setCErr(false),1500)}};
+  const unlockCode=()=>{const c=code.trim().toUpperCase();if(CODES[c]){track("unlock_code_success",{code:c,bundles:CODES[c].join(",")});upd(p=>({...p,unlockedBundles:[...new Set([...p.unlockedBundles,...CODES[c]])]}));setToast("🎉 Unlocked!");setCode("");setCErr(false)}else{track("unlock_code_failed");setCErr(true);setTimeout(()=>setCErr(false),1500)}};
 
   const openF=fw=>{if(!isUnlocked(fw)){track("framework_locked_click",{framework_id:fw.id,framework_name:fw.name,domain:fw.domain});setTab("store");return}if(isStub(fw))return;track("framework_started",{framework_id:fw.id,framework_name:fw.name,domain:fw.domain,author:fw.author,is_free:fw.bundles.includes("free")});setActiveF(fw);const steps=flatSteps(fw);let resume=0;for(let i=0;i<steps.length;i++){const s=steps[i];if(s.type==="question"||s.type==="choice"){if(state.userResponses[fw.id]?.[s.id])resume=i+1;else break}else if(s.type==="template"){if(state.userResponses[fw.id]?.[s.id+"_field_0"])resume=i+1;else break}else resume=i}if(isComplete(fw))resume=0;setStepIdx(Math.min(resume,steps.length-1))};
 
@@ -598,7 +633,25 @@ export default function App(){
     <div style={{padding:desk?32:20,maxWidth:wide?900:640,margin:"0 auto"}}>
       <div style={{textAlign:"center",marginBottom:desk?32:24}}>
         <h1 style={{color:"#f1f5f9",margin:"0 0 4px",fontSize:desk?32:26}}>AIBOS Coach</h1>
-        <p style={{color:"#94a3b8",margin:0,fontSize:desk?16:14}}>You know what to do. This helps you do it.</p>
+        <p style={{color:"#94a3b8",margin:"0 0 12px",fontSize:desk?16:14}}>You know what to do. This helps you do it.</p>
+        {userName?<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+          {userPhoto&&<img src={userPhoto} alt="" style={{width:32,height:32,borderRadius:99}}/>}
+          <span style={{color:"#cbd5e1",fontSize:14}}>{userName}</span>
+          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Sign out</button>
+        </div>
+        :<div style={{background:"#1e293b",borderRadius:12,padding:20,maxWidth:360,margin:"0 auto",border:"1px solid #334155"}}>
+          <button onClick={async()=>{setAuthErr("");const u=await signInWithGoogle();if(u)setToast("Welcome, "+u.displayName+"!")}} style={{width:"100%",padding:"10px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#f1f5f9",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:12}}>
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Sign in with Google
+          </button>
+          <div style={{textAlign:"center",color:"#64748b",fontSize:12,marginBottom:12}}>or</div>
+          {authMode==="signup"&&<input value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Your name" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>}
+          <input value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="Email" type="email" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>
+          <input value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="Password" type="password" onKeyDown={e=>e.key==="Enter"&&authEmail&&authPass&&(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:10,boxSizing:"border-box"}}/>
+          {authErr&&<p style={{color:"#ef4444",fontSize:12,margin:"0 0 8px"}}>{authErr}</p>}
+          <button onClick={()=>{setAuthErr("");(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))}} style={{width:"100%",padding:"10px",borderRadius:8,border:"none",background:"#3b82f6",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8}}>{authMode==="login"?"Sign In":"Create Account"}</button>
+          <p style={{textAlign:"center",margin:0}}><button onClick={()=>{setAuthMode(authMode==="login"?"signup":"login");setAuthErr("")}} style={{background:"none",border:"none",color:"#94a3b8",fontSize:12,cursor:"pointer"}}>{authMode==="login"?"Don't have an account? Sign Up":"Already have an account? Sign In"}</button></p>
+        </div>}
       </div>
       {has&&<div style={{background:"#1e293b",borderRadius:12,padding:16,marginBottom:16}}>
         <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{color:"#94a3b8",fontSize:13}}>Progress</span><span style={{color:"#22c55e",fontSize:13,fontWeight:700}}>{completed} / {total}</span></div>
@@ -708,8 +761,13 @@ export default function App(){
           </button>
         ))}
       </nav>
-      <div style={{padding:16,borderTop:"1px solid #334155"}}>
-        <p style={{color:"#475569",fontSize:10,margin:0,lineHeight:1.4}}>Built by the AI system behind a 215K+ subscriber newsletter</p>
+      <div style={{padding:12,borderTop:"1px solid #334155"}}>
+        {userName?<div style={{display:"flex",alignItems:"center",gap:8}}>
+          {userPhoto&&<img src={userPhoto} alt="" style={{width:28,height:28,borderRadius:99}}/>}
+          <div><div style={{color:"#cbd5e1",fontSize:12,fontWeight:600}}>{userName}</div>
+          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:10,cursor:"pointer",padding:0}}>Sign out</button></div>
+        </div>
+        :<button onClick={async()=>{const u=await signInWithGoogle();if(u){setToast("Welcome!")}}} style={{width:"100%",padding:"8px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#94a3b8",fontSize:12,cursor:"pointer"}}>Sign in with Google</button>}
       </div>
     </div>
   );

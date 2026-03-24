@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent as fbLogEvent, setUserProperties, setUserId, Analytics } from "firebase/analytics";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, Firestore } from "firebase/firestore";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut as fbSignOut, onAuthStateChanged, Auth, User } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARXmL7UNm7CZVZFdxz80b4WQz7IIMCO3s",
@@ -14,11 +15,14 @@ const firebaseConfig = {
 
 let analytics: Analytics | null = null;
 let db: Firestore | null = null;
+let auth: Auth | null = null;
+const googleProvider = new GoogleAuthProvider();
 
 try {
   const app = initializeApp(firebaseConfig);
   analytics = getAnalytics(app);
   db = getFirestore(app);
+  auth = getAuth(app);
 } catch (e) {
   // May fail in some environments (localhost, ad blockers)
 }
@@ -30,7 +34,177 @@ export function track(event: string, params?: Record<string, string | number | b
   } catch {}
 }
 
-// Extract email & UTM from URL, save to localStorage + Firestore + Analytics
+// ─── AUTH ───
+
+export async function signInWithGoogle(): Promise<User | null> {
+  if (!auth) return null;
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    track("login", { method: "google" });
+
+    // Set Analytics user
+    if (analytics && user.email) {
+      setUserId(analytics, user.email);
+      setUserProperties(analytics, { email: user.email });
+    }
+
+    // Create/update user in Firestore
+    if (db && user.email) {
+      const userRef = doc(db, "users", user.email);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          name: user.displayName || "",
+          photo: user.photoURL || "",
+          first_visit: new Date().toISOString(),
+          last_visit: new Date().toISOString(),
+          visits: 1,
+          unlocked_bundles: ["free"],
+          completed_frameworks: []
+        });
+      } else {
+        await updateDoc(userRef, {
+          last_visit: new Date().toISOString(),
+          name: user.displayName || userDoc.data().name || "",
+          visits: (userDoc.data().visits || 0) + 1
+        });
+      }
+    }
+
+    return user;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function signInWithEmail(email: string, password: string): Promise<User | null> {
+  if (!auth) return null;
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+    track("login", { method: "email" });
+
+    if (analytics && user.email) {
+      setUserId(analytics, user.email);
+      setUserProperties(analytics, { email: user.email });
+    }
+
+    if (db && user.email) {
+      const userRef = doc(db, "users", user.email);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        await updateDoc(userRef, {
+          last_visit: new Date().toISOString(),
+          visits: (userDoc.data().visits || 0) + 1
+        });
+      }
+    }
+
+    return user;
+  } catch (e: any) {
+    throw new Error(e.code === "auth/invalid-credential" ? "Wrong email or password" : e.code === "auth/too-many-requests" ? "Too many attempts. Try again later" : e.message);
+  }
+}
+
+export async function signUpWithEmail(email: string, password: string, name: string): Promise<User | null> {
+  if (!auth) return null;
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+
+    if (name) await updateProfile(user, { displayName: name });
+
+    track("sign_up", { method: "email" });
+
+    if (analytics && user.email) {
+      setUserId(analytics, user.email);
+      setUserProperties(analytics, { email: user.email });
+    }
+
+    if (db && user.email) {
+      await setDoc(doc(db, "users", user.email), {
+        email: user.email,
+        name: name || "",
+        first_visit: new Date().toISOString(),
+        last_visit: new Date().toISOString(),
+        visits: 1,
+        unlocked_bundles: ["free"],
+        completed_frameworks: []
+      });
+    }
+
+    return user;
+  } catch (e: any) {
+    throw new Error(e.code === "auth/email-already-in-use" ? "This email is already registered. Try signing in" : e.code === "auth/weak-password" ? "Password must be at least 6 characters" : e.message);
+  }
+}
+
+export async function signOut(): Promise<void> {
+  if (!auth) return;
+  try {
+    await fbSignOut(auth);
+    track("logout");
+  } catch {}
+}
+
+export function onAuthChange(callback: (user: User | null) => void): () => void {
+  if (!auth) return () => {};
+  return onAuthStateChanged(auth, callback);
+}
+
+// ─── FIRESTORE: USER DATA ───
+
+// Load user's unlocked bundles from Firestore
+export async function loadUserBundles(email: string): Promise<string[]> {
+  if (!db || !email) return ["free"];
+  try {
+    const userRef = doc(db, "users", email);
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      const bundles = userDoc.data().unlocked_bundles || ["free"];
+      return [...new Set(["free", ...bundles])];
+    }
+  } catch {}
+  return ["free"];
+}
+
+// Load user's completed frameworks + responses from Firestore
+export async function loadUserProgress(email: string): Promise<{ completedFrameworks: string[], userResponses: Record<string, Record<string, string>>, commitments: any[] }> {
+  if (!db || !email) return { completedFrameworks: [], userResponses: {}, commitments: [] };
+  try {
+    const userRef = doc(db, "users", email);
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      return {
+        completedFrameworks: data.completed_frameworks || [],
+        userResponses: data.user_responses || {},
+        commitments: data.commitments || []
+      };
+    }
+  } catch {}
+  return { completedFrameworks: [], userResponses: {}, commitments: [] };
+}
+
+// Save full state to Firestore for logged-in user
+export async function saveUserState(email: string, state: { unlockedBundles: string[], completedFrameworks: string[], userResponses: Record<string, Record<string, string>>, commitments: any[] }) {
+  if (!db || !email) return;
+  try {
+    const userRef = doc(db, "users", email);
+    await updateDoc(userRef, {
+      unlocked_bundles: state.unlockedBundles,
+      completed_frameworks: state.completedFrameworks,
+      user_responses: state.userResponses,
+      commitments: state.commitments,
+      last_activity: new Date().toISOString()
+    });
+  } catch {}
+}
+
+// ─── UTM CAPTURE ───
+
 export async function captureUser(): Promise<string | null> {
   const params = new URLSearchParams(window.location.search);
   const urlEmail = params.get("email");
@@ -38,16 +212,13 @@ export async function captureUser(): Promise<string | null> {
   const utmMedium = params.get("utm_medium") || "";
   const utmCampaign = params.get("utm_campaign") || "";
 
-  // Priority: URL email > localStorage email
   const savedEmail = localStorage.getItem("aibos-email");
   const email = urlEmail || savedEmail;
 
   if (!email) return null;
 
-  // Save to localStorage
   localStorage.setItem("aibos-email", email);
 
-  // Clean URL (remove email param for privacy)
   if (urlEmail && window.history.replaceState) {
     params.delete("email");
     const cleanUrl = params.toString()
@@ -56,7 +227,6 @@ export async function captureUser(): Promise<string | null> {
     window.history.replaceState({}, "", cleanUrl);
   }
 
-  // Set Analytics user properties
   if (analytics) {
     try {
       setUserId(analytics, email);
@@ -69,12 +239,10 @@ export async function captureUser(): Promise<string | null> {
     } catch {}
   }
 
-  // Save/update user in Firestore
   if (db && urlEmail) {
     try {
       const userRef = doc(db, "users", email);
       const userDoc = await getDoc(userRef);
-
       if (!userDoc.exists()) {
         await setDoc(userRef, {
           email,
@@ -83,22 +251,12 @@ export async function captureUser(): Promise<string | null> {
           utm_campaign: utmCampaign,
           first_visit: new Date().toISOString(),
           last_visit: new Date().toISOString(),
-          visits: 1
+          visits: 1,
+          unlocked_bundles: ["free"],
+          completed_frameworks: []
         });
         track("new_user", { email, utm_source: utmSource });
       } else {
-        await updateDoc(userRef, {
-          last_visit: new Date().toISOString(),
-          visits: (userDoc.data().visits || 0) + 1
-        });
-      }
-    } catch {}
-  } else if (db && savedEmail) {
-    // Returning user without URL email -- just update last_visit
-    try {
-      const userRef = doc(db, "users", savedEmail);
-      const userDoc = await getDoc(userRef);
-      if (userDoc.exists()) {
         await updateDoc(userRef, {
           last_visit: new Date().toISOString(),
           visits: (userDoc.data().visits || 0) + 1
@@ -110,7 +268,8 @@ export async function captureUser(): Promise<string | null> {
   return email;
 }
 
-// Save waitlist signup to Firestore
+// ─── WAITLIST ───
+
 export async function saveWaitlist(email: string, type: "coach_chat" | "bundle_purchase", bundleId?: string, bundleName?: string) {
   if (!db || !email) return;
   try {
@@ -125,7 +284,8 @@ export async function saveWaitlist(email: string, type: "coach_chat" | "bundle_p
   } catch {}
 }
 
-// Save framework completion to user's Firestore record
+// ─── PROGRESS (legacy, used by non-logged-in users) ───
+
 export async function saveUserProgress(email: string, frameworkId: string, frameworkName: string) {
   if (!db || !email) return;
   try {
