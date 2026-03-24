@@ -586,21 +586,21 @@ export default function App(){
         <div style={{height:4,background:"#334155",flexShrink:0}}><div style={{height:4,background:col,width:`${((stepIdx+1)/total)*100}%`,transition:"width 0.3s"}}/></div>
         <div style={{padding:"12px 16px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #334155",flexShrink:0}}>
           <button onClick={()=>setActiveF(null)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:20,cursor:"pointer",padding:0}}>←</button>
-          <span style={{color:"#94a3b8",fontSize:13}}>Step {stepIdx+1} of {total}</span>
-          <span style={{marginLeft:"auto",fontSize:12,color:col,fontWeight:600}}>{fw.name}</span>
+          <span style={{color:"#94a3b8",fontSize:17}}>Step {stepIdx+1} of {total}</span>
+          <span style={{marginLeft:"auto",fontSize:20,color:col,fontWeight:600}}>{fw.name}</span>
         </div>
         <div ref={scrollRef} style={{flex:1,overflow:"auto",padding:desk?"24px 32px":"16px"}}>
           <h3 style={{color:"#f1f5f9",margin:"0 0 12px",fontSize:desk?20:18}}>{s.title}</h3>
-          {(s.type==="info"||s.type==="reflection"||s.type==="action")&&<div style={{borderLeft:`4px solid ${col}`,paddingLeft:14,color:"#cbd5e1",lineHeight:1.7,fontSize:15,whiteSpace:"pre-wrap"}}>{resolve(s.text,fid)}</div>}
-          {s.type==="question"&&<><p style={{color:"#cbd5e1",lineHeight:1.6,fontSize:15,margin:"0 0 12px"}}>{resolve(s.text,fid)}</p>
-          {s.inputType==="textarea"?<textarea value={resp[s.id]||""} onChange={e=>setResp(fid,s.id,e.target.value)} placeholder="Type your answer..." rows={4} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:12,fontSize:15,resize:"vertical",boxSizing:"border-box"}}/>
-          :<input value={resp[s.id]||""} onChange={e=>setResp(fid,s.id,e.target.value)} placeholder="Type your answer..." style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:12,fontSize:15,boxSizing:"border-box"}}/>}</>}
-          {s.type==="choice"&&<><p style={{color:"#cbd5e1",lineHeight:1.6,fontSize:15,margin:"0 0 12px"}}>{resolve(s.text,fid)}</p>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>{s.options.map(o=><button key={o} onClick={()=>setResp(fid,s.id,o)} style={{padding:"12px 14px",borderRadius:8,border:resp[s.id]===o?`2px solid ${col}`:"2px solid #475569",background:resp[s.id]===o?col+"18":"#0f172a",color:"#f1f5f9",textAlign:"left",fontSize:14,cursor:"pointer",lineHeight:1.4}}>{o}</button>)}</div></>}
-          {s.type==="template"&&<div style={{display:"flex",flexDirection:"column",gap:14}}>{s.fields.map((f,i)=><div key={i}><label style={{color:"#94a3b8",fontSize:13,fontWeight:600,marginBottom:4,display:"block"}}>{f.label}</label><textarea value={resp[s.id+"_field_"+i]||""} onChange={e=>setResp(fid,s.id+"_field_"+i,e.target.value)} placeholder={f.placeholder} rows={2} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,resize:"vertical",boxSizing:"border-box"}}/></div>)}</div>}
+          {(s.type==="info"||s.type==="reflection"||s.type==="action")&&<div style={{borderLeft:`4px solid ${col}`,paddingLeft:14,color:"#cbd5e1",lineHeight:1.7,fontSize:17,whiteSpace:"pre-wrap"}}>{resolve(s.text,fid)}</div>}
+          {s.type==="question"&&<><p style={{color:"#cbd5e1",lineHeight:1.6,fontSize:17,margin:"0 0 12px"}}>{resolve(s.text,fid)}</p>
+          {s.inputType==="textarea"?<textarea value={resp[s.id]||""} onChange={e=>setResp(fid,s.id,e.target.value)} placeholder="Type your answer..." rows={4} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:12,fontSize:17,resize:"vertical",boxSizing:"border-box"}}/>
+          :<input value={resp[s.id]||""} onChange={e=>setResp(fid,s.id,e.target.value)} placeholder="Type your answer..." style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:12,fontSize:17,boxSizing:"border-box"}}/>}</>}
+          {s.type==="choice"&&<><p style={{color:"#cbd5e1",lineHeight:1.6,fontSize:17,margin:"0 0 12px"}}>{resolve(s.text,fid)}</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>{s.options.map(o=><button key={o} onClick={()=>setResp(fid,s.id,o)} style={{padding:"12px 14px",borderRadius:8,border:resp[s.id]===o?`2px solid ${col}`:"2px solid #475569",background:resp[s.id]===o?col+"18":"#0f172a",color:"#f1f5f9",textAlign:"left",fontSize:20,cursor:"pointer",lineHeight:1.4}}>{o}</button>)}</div></>}
+          {s.type==="template"&&<div style={{display:"flex",flexDirection:"column",gap:14}}>{s.fields.map((f,i)=><div key={i}><label style={{color:"#94a3b8",fontSize:17,fontWeight:600,marginBottom:4,display:"block"}}>{f.label}</label><textarea value={resp[s.id+"_field_"+i]||""} onChange={e=>setResp(fid,s.id+"_field_"+i,e.target.value)} placeholder={f.placeholder} rows={2} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,resize:"vertical",boxSizing:"border-box"}}/></div>)}</div>}
         </div>
         <div style={{padding:16,borderTop:"1px solid #334155",flexShrink:0}}>
-          <button onClick={goNext} disabled={!canNext()} style={{width:"100%",padding:"14px 0",borderRadius:10,border:"none",fontWeight:700,fontSize:16,cursor:canNext()?"pointer":"not-allowed",background:canNext()?(isLast?col:`linear-gradient(135deg,${col},${col}cc)`):"#475569",color:canNext()?"#fff":"#94a3b8",opacity:canNext()?1:0.6}}>{isLast?"🏁 Finish":"Next →"}</button>
+          <button onClick={goNext} disabled={!canNext()} style={{width:"100%",padding:"14px 0",borderRadius:10,border:"none",fontWeight:700,fontSize:20,cursor:canNext()?"pointer":"not-allowed",background:canNext()?(isLast?col:`linear-gradient(135deg,${col},${col}cc)`):"#475569",color:canNext()?"#fff":"#94a3b8",opacity:canNext()?1:0.6}}>{isLast?"🏁 Finish":"Next →"}</button>
         </div>
       </div>
     );
@@ -610,18 +610,18 @@ export default function App(){
   const FCard=({fw})=>{const unlocked=isUnlocked(fw),complete=isComplete(fw),stub=isStub(fw),col=DC[fw.domain];return(
     <div style={{background:"#1e293b",borderRadius:12,padding:desk?20:16,border:`1px solid ${unlocked?"#334155":"#47556980"}`,opacity:unlocked?1:0.7}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-        <span style={{fontSize:14}}>{unlocked?(complete?"✅":"🔓"):"🔒"}</span>
-        <span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:col+"22",color:col,textTransform:"uppercase"}}>{fw.domain}</span>
-        <span style={{marginLeft:"auto",fontSize:11,color:"#94a3b8"}}>{fw.author}</span>
+        <span style={{fontSize:20}}>{unlocked?(complete?"✅":"🔓"):"🔒"}</span>
+        <span style={{fontSize:17,fontWeight:700,padding:"2px 8px",borderRadius:99,background:col+"22",color:col,textTransform:"uppercase"}}>{fw.domain}</span>
+        <span style={{marginLeft:"auto",fontSize:17,color:"#94a3b8"}}>{fw.author}</span>
       </div>
       <h3 style={{color:"#f1f5f9",margin:"0 0 4px",fontSize:desk?17:16}}>{fw.name}</h3>
-      <p style={{color:"#94a3b8",margin:"0 0 8px",fontSize:13,fontStyle:"italic"}}>{fw.tagline}</p>
-      {!unlocked&&<p style={{color:"#64748b",margin:"0 0 10px",fontSize:13}}>{fw.teaser}</p>}
+      <p style={{color:"#94a3b8",margin:"0 0 8px",fontSize:17,fontStyle:"italic"}}>{fw.tagline}</p>
+      {!unlocked&&<p style={{color:"#64748b",margin:"0 0 10px",fontSize:17}}>{fw.teaser}</p>}
       <div style={{display:"flex",gap:8,alignItems:"center"}}>
-        {stub?<span style={{fontSize:12,color:"#64748b",fontWeight:600}}>Coming Soon</span>
-        :unlocked?<button onClick={()=>openF(fw)} style={{padding:"8px 18px",borderRadius:8,border:"none",background:col,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>{complete?"Review":"Start"}</button>
-        :<button onClick={()=>setTab("store")} style={{padding:"8px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:13,cursor:"pointer"}}>Unlock</button>}
-        {complete&&<button onClick={()=>restartF(fw.id)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Restart</button>}
+        {stub?<span style={{fontSize:20,color:"#64748b",fontWeight:600}}>Coming Soon</span>
+        :unlocked?<button onClick={()=>openF(fw)} style={{padding:"8px 18px",borderRadius:8,border:"none",background:col,color:"#fff",fontWeight:700,fontSize:17,cursor:"pointer"}}>{complete?"Review":"Start"}</button>
+        :<button onClick={()=>setTab("store")} style={{padding:"8px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:17,cursor:"pointer"}}>Unlock</button>}
+        {complete&&<button onClick={()=>restartF(fw.id)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:20,cursor:"pointer",textDecoration:"underline"}}>Restart</button>}
       </div>
     </div>
   )};
@@ -636,45 +636,48 @@ export default function App(){
         <p style={{color:"#94a3b8",margin:"0 0 12px",fontSize:desk?16:14}}>You know what to do. This helps you do it.</p>
         {userName?<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
           {userPhoto&&<img src={userPhoto} alt="" style={{width:32,height:32,borderRadius:99}}/>}
-          <span style={{color:"#cbd5e1",fontSize:14}}>{userName}</span>
-          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Sign out</button>
+          <span style={{color:"#cbd5e1",fontSize:20}}>{userName}</span>
+          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:20,cursor:"pointer",textDecoration:"underline"}}>Sign out</button>
         </div>
-        :<div style={{background:"#1e293b",borderRadius:12,padding:20,maxWidth:360,margin:"0 auto",border:"1px solid #334155"}}>
-          <button onClick={async()=>{setAuthErr("");const u=await signInWithGoogle();if(u)setToast("Welcome, "+u.displayName+"!")}} style={{width:"100%",padding:"10px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#f1f5f9",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:12}}>
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            Sign in with Google
-          </button>
-          <div style={{textAlign:"center",color:"#64748b",fontSize:12,marginBottom:12}}>or</div>
-          {authMode==="signup"&&<input value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Your name" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>}
-          <input value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="Email" type="email" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>
-          <input value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="Password" type="password" onKeyDown={e=>e.key==="Enter"&&authEmail&&authPass&&(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:10,boxSizing:"border-box"}}/>
-          {authErr&&<p style={{color:"#ef4444",fontSize:12,margin:"0 0 8px"}}>{authErr}</p>}
-          <button onClick={()=>{setAuthErr("");(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))}} style={{width:"100%",padding:"10px",borderRadius:8,border:"none",background:"#3b82f6",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8}}>{authMode==="login"?"Sign In":"Create Account"}</button>
-          <p style={{textAlign:"center",margin:0}}><button onClick={()=>{setAuthMode(authMode==="login"?"signup":"login");setAuthErr("")}} style={{background:"none",border:"none",color:"#94a3b8",fontSize:12,cursor:"pointer"}}>{authMode==="login"?"Don't have an account? Sign Up":"Already have an account? Sign In"}</button></p>
+        :<div style={{maxWidth:360,margin:"0 auto"}}>
+          <button onClick={()=>setBuyBundle(buyBundle==="auth"?null:"auth")} style={{padding:"10px 24px",borderRadius:10,border:"1px solid #334155",background:"#1e293b",color:"#94a3b8",fontSize:20,cursor:"pointer",margin:"0 auto",display:"block"}}>{buyBundle==="auth"?"Hide":"Sign in to save progress"}</button>
+          {buyBundle==="auth"&&<div style={{background:"#1e293b",borderRadius:12,padding:20,marginTop:12,border:"1px solid #334155"}}>
+            <button onClick={async()=>{setAuthErr("");const u=await signInWithGoogle();if(u)setToast("Welcome, "+u.displayName+"!")}} style={{width:"100%",padding:"10px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#f1f5f9",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:12}}>
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Sign in with Google
+            </button>
+            <div style={{textAlign:"center",color:"#64748b",fontSize:20,marginBottom:12}}>or</div>
+            {authMode==="signup"&&<input value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Your name" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,marginBottom:8,boxSizing:"border-box"}}/>}
+            <input value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="Email" type="email" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,marginBottom:8,boxSizing:"border-box"}}/>
+            <input value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="Password" type="password" onKeyDown={e=>e.key==="Enter"&&authEmail&&authPass&&(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))} style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,marginBottom:10,boxSizing:"border-box"}}/>
+            {authErr&&<p style={{color:"#ef4444",fontSize:20,margin:"0 0 8px"}}>{authErr}</p>}
+            <button onClick={()=>{setAuthErr("");(authMode==="login"?signInWithEmail(authEmail,authPass).then(u=>{if(u)setToast("Welcome back!")}).catch(e=>setAuthErr(e.message)):signUpWithEmail(authEmail,authPass,authName).then(u=>{if(u)setToast("Account created!")}).catch(e=>setAuthErr(e.message)))}} style={{width:"100%",padding:"10px",borderRadius:8,border:"none",background:"#3b82f6",color:"#fff",fontWeight:700,fontSize:20,cursor:"pointer",marginBottom:8}}>{authMode==="login"?"Sign In":"Create Account"}</button>
+            <p style={{textAlign:"center",margin:0}}><button onClick={()=>{setAuthMode(authMode==="login"?"signup":"login");setAuthErr("")}} style={{background:"none",border:"none",color:"#94a3b8",fontSize:20,cursor:"pointer"}}>{authMode==="login"?"Don't have an account? Sign Up":"Already have an account? Sign In"}</button></p>
+          </div>}
         </div>}
       </div>
       {has&&<div style={{background:"#1e293b",borderRadius:12,padding:16,marginBottom:16}}>
-        <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{color:"#94a3b8",fontSize:13}}>Progress</span><span style={{color:"#22c55e",fontSize:13,fontWeight:700}}>{completed} / {total}</span></div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><span style={{color:"#94a3b8",fontSize:17}}>Progress</span><span style={{color:"#22c55e",fontSize:17,fontWeight:700}}>{completed} / {total}</span></div>
         <div style={{height:6,background:"#334155",borderRadius:3}}><div style={{height:6,background:"#22c55e",borderRadius:3,width:`${total?((completed/total)*100):0}%`}}/></div>
       </div>}
-      {!has&&<button onClick={()=>{setTab("frameworks");openF(F[0])}} style={{width:"100%",padding:"16px 0",borderRadius:12,border:"none",background:"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",fontWeight:700,fontSize:16,cursor:"pointer",marginBottom:20}}>🚀 Start Here — Three Buckets of Stuck</button>}
+      {!has&&<button onClick={()=>{setTab("frameworks");openF(F[0])}} style={{width:"100%",padding:"16px 0",borderRadius:12,border:"none",background:"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",fontWeight:700,fontSize:20,cursor:"pointer",marginBottom:20}}>🚀 Start Here — Three Buckets of Stuck</button>}
       <div style={{display:"grid",gridTemplateColumns:desk?"1fr 1fr 1fr":"1fr",gap:10,marginBottom:20}}>
         {[["core","Core",DC.core,"⚡"],["business","Business",DC.business,"💼"],["personal","Personal",DC.personal,"🧠"]].map(([d,n,cl,ico])=>(
           <div key={d} onClick={()=>{setFilter(d);setTab("frameworks")}} style={{background:"#1e293b",borderRadius:10,padding:14,display:"flex",alignItems:"center",gap:12,cursor:"pointer",border:`1px solid ${cl}33`}}>
-            <div style={{width:40,height:40,borderRadius:8,background:cl+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{ico}</div>
-            <div><div style={{color:"#f1f5f9",fontWeight:600,fontSize:15}}>{n}</div><div style={{color:"#94a3b8",fontSize:12}}>{F.filter(f=>f.domain===d).length} frameworks</div></div>
-            <span style={{marginLeft:"auto",color:cl,fontSize:11,fontWeight:600}}>{state.unlockedBundles.includes(d+"-domain")||d==="core"?"UNLOCKED":"LOCKED"}</span>
+            <div style={{width:40,height:40,borderRadius:8,background:cl+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{ico}</div>
+            <div><div style={{color:"#f1f5f9",fontWeight:600,fontSize:17}}>{n}</div><div style={{color:"#94a3b8",fontSize:20}}>{F.filter(f=>f.domain===d).length} frameworks</div></div>
+            <span style={{marginLeft:"auto",color:cl,fontSize:17,fontWeight:600}}>{state.unlockedBundles.includes(d+"-domain")||d==="core"?"UNLOCKED":"LOCKED"}</span>
           </div>
         ))}
       </div>
       {state.commitments.length>0&&<div style={{background:"#1e293b",borderRadius:12,padding:16}}>
-        <h3 style={{color:"#f1f5f9",margin:"0 0 10px",fontSize:15}}>📋 Your Commitments</h3>
+        <h3 style={{color:"#f1f5f9",margin:"0 0 10px",fontSize:17}}>📋 Your Commitments</h3>
         {state.commitments.slice(-5).reverse().map((c,i)=><div key={i} style={{borderLeft:"3px solid #22c55e",paddingLeft:10,marginBottom:10}}>
-          <p style={{color:"#cbd5e1",margin:0,fontSize:13,lineHeight:1.5}}>{c.text.slice(0,150)}{c.text.length>150?"...":""}</p>
-          <span style={{color:"#64748b",fontSize:11}}>{c.date} · {F.find(f=>f.id===c.frameworkId)?.name}</span>
+          <p style={{color:"#cbd5e1",margin:0,fontSize:17,lineHeight:1.5}}>{c.text.slice(0,150)}{c.text.length>150?"...":""}</p>
+          <span style={{color:"#64748b",fontSize:17}}>{c.date} · {F.find(f=>f.id===c.frameworkId)?.name}</span>
         </div>)}
       </div>}
-      <p style={{textAlign:"center",color:"#475569",fontSize:11,marginTop:24}}>Built by the AI system behind a 215K+ subscriber newsletter</p>
+      <p style={{textAlign:"center",color:"#475569",fontSize:17,marginTop:24}}>Built by the AI system behind a 215K+ subscriber newsletter</p>
     </div>)
   };
 
@@ -683,7 +686,7 @@ export default function App(){
     return(
     <div style={{padding:desk?24:16,maxWidth:wide?1000:640,margin:"0 auto"}}>
       <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
-        {["all","core","business","personal"].map(f=><button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:99,border:"none",fontSize:12,fontWeight:600,cursor:"pointer",background:filter===f?(f==="all"?"#f1f5f9":DC[f]):"#1e293b",color:filter===f?(f==="all"?"#0f172a":"#fff"):"#94a3b8"}}>{f==="all"?"All":f[0].toUpperCase()+f.slice(1)}</button>)}
+        {["all","core","business","personal"].map(f=><button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:99,border:"none",fontSize:20,fontWeight:600,cursor:"pointer",background:filter===f?(f==="all"?"#f1f5f9":DC[f]):"#1e293b",color:filter===f?(f==="all"?"#0f172a":"#fff"):"#94a3b8"}}>{f==="all"?"All":f[0].toUpperCase()+f.slice(1)}</button>)}
       </div>
       <div style={{display:"grid",gridTemplateColumns:wide?"1fr 1fr":desk?"1fr 1fr":"1fr",gap:12}}>{filtered.map(fw=><FCard key={fw.id} fw={fw}/>)}</div>
     </div>)
@@ -693,37 +696,37 @@ export default function App(){
     <div style={{padding:desk?24:16,maxWidth:wide?900:640,margin:"0 auto"}}>
       <h2 style={{color:"#f1f5f9",margin:"0 0 16px",fontSize:desk?24:20}}>🏪 Framework Store</h2>
       <div style={{background:"#1e293b",borderRadius:12,padding:16,marginBottom:20,border:"1px solid #334155"}}>
-        <h3 style={{color:"#f1f5f9",margin:"0 0 8px",fontSize:15}}>🔑 Got a code?</h3>
+        <h3 style={{color:"#f1f5f9",margin:"0 0 8px",fontSize:17}}>🔑 Got a code?</h3>
         <div style={{display:"flex",gap:8,maxWidth:400}}>
-          <input value={code} onChange={e=>{setCode(e.target.value);setCErr(false)}} placeholder="Enter unlock code" onKeyDown={e=>e.key==="Enter"&&unlockCode()} style={{flex:1,background:"#0f172a",border:`1px solid ${codeErr?"#ef4444":"#475569"}`,borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,animation:codeErr?"shake 0.3s":""}}/>
-          <button onClick={unlockCode} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:14,cursor:"pointer"}}>Unlock</button>
+          <input value={code} onChange={e=>{setCode(e.target.value);setCErr(false)}} placeholder="Enter unlock code" onKeyDown={e=>e.key==="Enter"&&unlockCode()} style={{flex:1,background:"#0f172a",border:`1px solid ${codeErr?"#ef4444":"#475569"}`,borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,animation:codeErr?"shake 0.3s":""}}/>
+          <button onClick={unlockCode} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Unlock</button>
         </div>
-        {codeErr&&<p style={{color:"#ef4444",fontSize:12,margin:"6px 0 0"}}>Invalid code.</p>}
+        {codeErr&&<p style={{color:"#ef4444",fontSize:20,margin:"6px 0 0"}}>Invalid code.</p>}
       </div>
       {BUNDLES.filter(b=>b.highlight).map(b=><div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:desk?20:16,marginBottom:16,border:"2px solid #f59e0b"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3 style={{color:"#f59e0b",margin:0,fontSize:desk?20:17}}>⭐ {b.name}</h3><span style={{color:"#f59e0b",fontWeight:800,fontSize:desk?26:22}}>${b.price}</span></div>
-        <p style={{color:"#cbd5e1",fontSize:14,margin:"8px 0 12px"}}>{b.desc}</p>
-        {buyBundle===b.id?<div style={{display:"flex",gap:8,maxWidth:400}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Enter your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:14,cursor:"pointer"}}>Join</button></div>
-        :<button onClick={()=>setBuyBundle(b.id)} style={{padding:"12px 32px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:14,cursor:"pointer"}}>Get Notified →</button>}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3 style={{color:"#f59e0b",margin:0,fontSize:desk?20:17}}>⭐ {b.name}</h3><span style={{color:"#f59e0b",fontWeight:800,fontSize:desk?24:22}}>${b.price}</span></div>
+        <p style={{color:"#cbd5e1",fontSize:20,margin:"8px 0 12px"}}>{b.desc}</p>
+        {buyBundle===b.id?<div style={{display:"flex",gap:8,maxWidth:400}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Enter your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
+        :<button onClick={()=>setBuyBundle(b.id)} style={{padding:"12px 32px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Get Notified →</button>}
       </div>)}
-      <h3 style={{color:"#94a3b8",fontSize:13,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Domain Bundles</h3>
+      <h3 style={{color:"#94a3b8",fontSize:17,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Domain Bundles</h3>
       <div style={{display:"grid",gridTemplateColumns:desk?"1fr 1fr":"1fr",gap:10,marginBottom:20}}>
         {BUNDLES.filter(b=>["business-domain","personal-domain"].includes(b.id)).map(b=>{const owned=state.unlockedBundles.includes(b.id);return(
           <div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:14,border:`1px solid ${b.color}44`}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:b.color,margin:0,fontSize:15}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:b.color,fontWeight:700}}>${b.price}</span></div>
-            <p style={{color:"#94a3b8",fontSize:12,margin:"4px 0 8px"}}>{b.desc}</p>
-            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:13}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 12px",borderRadius:8,border:"none",background:b.color,color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>Join</button></div>
-            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:b.color,fontSize:13,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:b.color,margin:0,fontSize:17}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:b.color,fontWeight:700}}>${b.price}</span></div>
+            <p style={{color:"#94a3b8",fontSize:20,margin:"4px 0 8px"}}>{b.desc}</p>
+            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:17}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 12px",borderRadius:8,border:"none",background:b.color,color:"#fff",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
+            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:b.color,fontSize:17,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
           </div>)})}
       </div>
-      <h3 style={{color:"#94a3b8",fontSize:13,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Author Packs</h3>
+      <h3 style={{color:"#94a3b8",fontSize:17,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Author Packs</h3>
       <div style={{display:"grid",gridTemplateColumns:wide?"1fr 1fr 1fr":desk?"1fr 1fr":"1fr",gap:8}}>
         {BUNDLES.filter(b=>!["business-domain","personal-domain","all-access"].includes(b.id)).map(b=>{const owned=state.unlockedBundles.includes(b.id);return(
           <div key={b.id} style={{background:"#1e293b",borderRadius:10,padding:14,border:"1px solid #334155"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:"#f1f5f9",margin:0,fontSize:14}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:"#f59e0b",fontWeight:700,fontSize:14}}>${b.price}</span></div>
-            <p style={{color:"#94a3b8",fontSize:12,margin:"4px 0 6px"}}>{b.desc}</p>
-            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:12}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 10px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:12,cursor:"pointer"}}>Join</button></div>
-            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:"#f59e0b",fontSize:12,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:"#f1f5f9",margin:0,fontSize:20}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:"#f59e0b",fontWeight:700,fontSize:20}}>${b.price}</span></div>
+            <p style={{color:"#94a3b8",fontSize:20,margin:"4px 0 6px"}}>{b.desc}</p>
+            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:20}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 10px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
+            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:"#f59e0b",fontSize:20,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
           </div>)})}
       </div>
     </div>
@@ -734,13 +737,13 @@ export default function App(){
       <div style={{fontSize:60,marginBottom:16}}>💬</div>
       <h2 style={{color:"#f1f5f9",margin:"0 0 8px"}}>AI Coach Chat</h2>
       <p style={{color:"#f59e0b",fontWeight:700,margin:"0 0 16px"}}>Coming Soon</p>
-      <p style={{color:"#94a3b8",fontSize:14,lineHeight:1.6,margin:"0 auto 20px"}}>We're building a live AI coach that knows every framework. Describe what's going on and the coach diagnoses, pulls frameworks, walks you through them.</p>
+      <p style={{color:"#94a3b8",fontSize:20,lineHeight:1.6,margin:"0 auto 20px"}}>We're building a live AI coach that knows every framework. Describe what's going on and the coach diagnoses, pulls frameworks, walks you through them.</p>
       <div style={{background:"#1e293b",borderRadius:12,padding:16,maxWidth:400,margin:"0 auto",border:"1px solid #334155",textAlign:"left"}}>
-        <h3 style={{color:"#f1f5f9",margin:"0 0 10px",fontSize:15}}>What you'll get</h3>
-        {["Describe your situation in plain language","Get matched to the right framework","Receive analysis — Hormozi, TOC, or Dickens","Walk away with a concrete action plan"].map((t,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:8}}><span style={{color:"#a855f7",flexShrink:0}}>→</span><span style={{color:"#cbd5e1",fontSize:13,lineHeight:1.5}}>{t}</span></div>)}
-        <p style={{color:"#94a3b8",fontSize:12,margin:"12px 0 8px"}}>Drop your email for early access.</p>
-        <input value={waitEmail} onChange={e=>setWaitEmail(e.target.value)} placeholder="your@email.com" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:14,marginBottom:8,boxSizing:"border-box"}}/>
-        <button onClick={()=>{if(waitEmail.includes("@")){saveWaitlist(waitEmail,"coach_chat");setToast("🎉 You're on the early access list!");setWaitEmail("")}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:"#a855f7",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Get Early Access</button>
+        <h3 style={{color:"#f1f5f9",margin:"0 0 10px",fontSize:17}}>What you'll get</h3>
+        {["Describe your situation in plain language","Get matched to the right framework","Receive analysis — Hormozi, TOC, or Dickens","Walk away with a concrete action plan"].map((t,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:8}}><span style={{color:"#a855f7",flexShrink:0}}>→</span><span style={{color:"#cbd5e1",fontSize:17,lineHeight:1.5}}>{t}</span></div>)}
+        <p style={{color:"#94a3b8",fontSize:20,margin:"12px 0 8px"}}>Drop your email for early access.</p>
+        <input value={waitEmail} onChange={e=>setWaitEmail(e.target.value)} placeholder="your@email.com" style={{width:"100%",background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,marginBottom:8,boxSizing:"border-box"}}/>
+        <button onClick={()=>{if(waitEmail.includes("@")){saveWaitlist(waitEmail,"coach_chat");setToast("🎉 You're on the early access list!");setWaitEmail("")}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:"#a855f7",color:"#fff",fontWeight:700,fontSize:20,cursor:"pointer"}}>Get Early Access</button>
       </div>
     </div>
   );
@@ -752,22 +755,22 @@ export default function App(){
   const Sidebar=()=>(
     <div style={{width:220,background:"#1e293b",borderRight:"1px solid #334155",display:"flex",flexDirection:"column",flexShrink:0,height:"100%"}}>
       <div style={{padding:"20px 16px 12px",borderBottom:"1px solid #334155"}}>
-        <h2 style={{color:"#f1f5f9",margin:0,fontSize:18}}>AIBOS Coach</h2>
+        <h2 style={{color:"#f1f5f9",margin:0,fontSize:20}}>AIBOS Coach</h2>
       </div>
       <nav style={{flex:1,padding:"12px 8px"}}>
         {tabs.map(([id,icon,label])=>(
-          <button key={id} onClick={()=>setTab(id)} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:8,border:"none",background:tab===id?"#334155":"transparent",color:tab===id?"#f1f5f9":"#94a3b8",fontSize:14,fontWeight:tab===id?600:400,cursor:"pointer",marginBottom:2,textAlign:"left"}}>
-            <span style={{fontSize:16}}>{icon}</span>{label}
+          <button key={id} onClick={()=>setTab(id)} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:8,border:"none",background:tab===id?"#334155":"transparent",color:tab===id?"#f1f5f9":"#94a3b8",fontSize:20,fontWeight:tab===id?600:400,cursor:"pointer",marginBottom:2,textAlign:"left"}}>
+            <span style={{fontSize:20}}>{icon}</span>{label}
           </button>
         ))}
       </nav>
       <div style={{padding:12,borderTop:"1px solid #334155"}}>
         {userName?<div style={{display:"flex",alignItems:"center",gap:8}}>
           {userPhoto&&<img src={userPhoto} alt="" style={{width:28,height:28,borderRadius:99}}/>}
-          <div><div style={{color:"#cbd5e1",fontSize:12,fontWeight:600}}>{userName}</div>
-          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:10,cursor:"pointer",padding:0}}>Sign out</button></div>
+          <div><div style={{color:"#cbd5e1",fontSize:20,fontWeight:600}}>{userName}</div>
+          <button onClick={()=>signOut()} style={{background:"none",border:"none",color:"#64748b",fontSize:20,cursor:"pointer",padding:0}}>Sign out</button></div>
         </div>
-        :<button onClick={async()=>{const u=await signInWithGoogle();if(u){setToast("Welcome!")}}} style={{width:"100%",padding:"8px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#94a3b8",fontSize:12,cursor:"pointer"}}>Sign in with Google</button>}
+        :<button onClick={async()=>{const u=await signInWithGoogle();if(u){setToast("Welcome!")}}} style={{width:"100%",padding:"8px",borderRadius:8,border:"1px solid #334155",background:"#0f172a",color:"#94a3b8",fontSize:20,cursor:"pointer"}}>Sign in with Google</button>}
       </div>
     </div>
   );
@@ -777,8 +780,8 @@ export default function App(){
     <div style={{display:"flex",borderTop:"1px solid #334155",background:"#1e293b",flexShrink:0}}>
       {tabs.map(([id,icon,label])=>(
         <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"12px 0 10px",border:"none",background:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-          <span style={{fontSize:22}}>{icon}</span>
-          <span style={{fontSize:13,fontWeight:tab===id?700:400,color:tab===id?"#f1f5f9":"#94a3b8"}}>{label}</span>
+          <span style={{fontSize:20}}>{icon}</span>
+          <span style={{fontSize:17,fontWeight:tab===id?700:400,color:tab===id?"#f1f5f9":"#94a3b8"}}>{label}</span>
         </button>
       ))}
     </div>
@@ -793,7 +796,7 @@ export default function App(){
           {renderStep(activeF)}
         </div>
         {!desk&&<BottomTabs/>}
-        {toast&&<div style={{position:"fixed",bottom:desk?20:80,left:"50%",transform:"translateX(-50%)",background:"#22c55e",color:"#fff",padding:"10px 20px",borderRadius:10,fontWeight:700,fontSize:14,zIndex:99}}>{toast}</div>}
+        {toast&&<div style={{position:"fixed",bottom:desk?20:80,left:"50%",transform:"translateX(-50%)",background:"#22c55e",color:"#fff",padding:"10px 20px",borderRadius:10,fontWeight:700,fontSize:20,zIndex:99}}>{toast}</div>}
         <style>{`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}`}</style>
       </div>
     );
@@ -810,7 +813,7 @@ export default function App(){
         {tab==="coach"&&renderCoach()}
       </div>
       {!desk&&<BottomTabs/>}
-      {toast&&<div style={{position:"fixed",bottom:desk?20:80,left:"50%",transform:"translateX(-50%)",background:"#22c55e",color:"#fff",padding:"10px 20px",borderRadius:10,fontWeight:700,fontSize:14,zIndex:99}}>{toast}</div>}
+      {toast&&<div style={{position:"fixed",bottom:desk?20:80,left:"50%",transform:"translateX(-50%)",background:"#22c55e",color:"#fff",padding:"10px 20px",borderRadius:10,fontWeight:700,fontSize:20,zIndex:99}}>{toast}</div>}
       <style>{`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}`}</style>
     </div>
   );
