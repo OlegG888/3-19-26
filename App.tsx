@@ -695,14 +695,6 @@ export default function App(){
   const renderStore=()=>(
     <div style={{padding:desk?24:16,maxWidth:wide?900:640,margin:"0 auto"}}>
       <h2 style={{color:"#f1f5f9",margin:"0 0 16px",fontSize:desk?24:20}}>🏪 Framework Store</h2>
-      <div style={{background:"#1e293b",borderRadius:12,padding:16,marginBottom:20,border:"1px solid #334155"}}>
-        <h3 style={{color:"#f1f5f9",margin:"0 0 8px",fontSize:17}}>🔑 Got a code?</h3>
-        <div style={{display:"flex",gap:8,maxWidth:400}}>
-          <input value={code} onChange={e=>{setCode(e.target.value);setCErr(false)}} placeholder="Enter unlock code" onKeyDown={e=>e.key==="Enter"&&unlockCode()} style={{flex:1,background:"#0f172a",border:`1px solid ${codeErr?"#ef4444":"#475569"}`,borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20,animation:codeErr?"shake 0.3s":""}}/>
-          <button onClick={unlockCode} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Unlock</button>
-        </div>
-        {codeErr&&<p style={{color:"#ef4444",fontSize:20,margin:"6px 0 0"}}>Invalid code.</p>}
-      </div>
       {BUNDLES.filter(b=>b.highlight).map(b=><div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:desk?20:16,marginBottom:16,border:"2px solid #f59e0b"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3 style={{color:"#f59e0b",margin:0,fontSize:desk?20:17}}>⭐ {b.name}</h3><span style={{color:"#f59e0b",fontWeight:800,fontSize:desk?24:22}}>${b.price}</span></div>
         <p style={{color:"#cbd5e1",fontSize:20,margin:"8px 0 12px"}}>{b.desc}</p>
