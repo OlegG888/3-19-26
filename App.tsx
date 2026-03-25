@@ -585,7 +585,7 @@ export default function App(){
       <div style={{display:"flex",flexDirection:"column",height:"100%",maxWidth:maxW,margin:"0 auto",width:"100%"}}>
         <div style={{height:4,background:"#334155",flexShrink:0}}><div style={{height:4,background:col,width:`${((stepIdx+1)/total)*100}%`,transition:"width 0.3s"}}/></div>
         <div style={{padding:"12px 16px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #334155",flexShrink:0}}>
-          <button onClick={()=>setActiveF(null)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:20,cursor:"pointer",padding:0}}>←</button>
+          <button onClick={()=>stepIdx>0?setStepIdx(stepIdx-1):setActiveF(null)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:20,cursor:"pointer",padding:0}}>←</button>
           <span style={{color:"#94a3b8",fontSize:17}}>Step {stepIdx+1} of {total}</span>
           <span style={{marginLeft:"auto",fontSize:20,color:col,fontWeight:600}}>{fw.name}</span>
         </div>
