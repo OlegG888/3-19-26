@@ -766,7 +766,7 @@ export default function App(){
 
   // ─── MOBILE BOTTOM TABS ───
   const BottomTabs=()=>(
-    <div style={{display:"flex",borderTop:"1px solid #334155",background:"#1e293b",flexShrink:0}}>
+    <div style={{display:"flex",borderTop:"1px solid #334155",background:"#1e293b",flexShrink:0,paddingBottom:"env(safe-area-inset-bottom, 0px)"}}>
       {tabs.map(([id,icon,label])=>(
         <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"12px 0 10px",border:"none",background:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
           <span style={{fontSize:20}}>{icon}</span>
