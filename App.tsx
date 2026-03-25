@@ -706,8 +706,7 @@ export default function App(){
       {BUNDLES.filter(b=>b.highlight).map(b=><div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:desk?20:16,marginBottom:16,border:"2px solid #f59e0b"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h3 style={{color:"#f59e0b",margin:0,fontSize:desk?20:17}}>⭐ {b.name}</h3><span style={{color:"#f59e0b",fontWeight:800,fontSize:desk?24:22}}>${b.price}</span></div>
         <p style={{color:"#cbd5e1",fontSize:20,margin:"8px 0 12px"}}>{b.desc}</p>
-        {buyBundle===b.id?<div style={{display:"flex",gap:8,maxWidth:400}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Enter your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:10,fontSize:20}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"10px 18px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
-        :<button onClick={()=>setBuyBundle(b.id)} style={{padding:"12px 32px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Get Notified →</button>}
+        <a href={b.url} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",padding:"12px 32px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer",textDecoration:"none"}} onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})}>Buy Now →</a>
       </div>)}
       <h3 style={{color:"#94a3b8",fontSize:17,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Domain Bundles</h3>
       <div style={{display:"grid",gridTemplateColumns:desk?"1fr 1fr":"1fr",gap:10,marginBottom:20}}>
@@ -715,8 +714,7 @@ export default function App(){
           <div key={b.id} style={{background:"#1e293b",borderRadius:12,padding:14,border:`1px solid ${b.color}44`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:b.color,margin:0,fontSize:17}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:b.color,fontWeight:700}}>${b.price}</span></div>
             <p style={{color:"#94a3b8",fontSize:20,margin:"4px 0 8px"}}>{b.desc}</p>
-            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:17}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 12px",borderRadius:8,border:"none",background:b.color,color:"#fff",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
-            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:b.color,fontSize:17,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
+            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})} style={{color:b.color,fontSize:17,fontWeight:600,textDecoration:"none"}}>Buy Now →</a>}
           </div>)})}
       </div>
       <h3 style={{color:"#94a3b8",fontSize:17,fontWeight:700,margin:"20px 0 10px",textTransform:"uppercase",letterSpacing:1}}>Author Packs</h3>
@@ -725,8 +723,7 @@ export default function App(){
           <div key={b.id} style={{background:"#1e293b",borderRadius:10,padding:14,border:"1px solid #334155"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h4 style={{color:"#f1f5f9",margin:0,fontSize:20}}>{owned?"✅ ":""}{b.name}</h4><span style={{color:"#f59e0b",fontWeight:700,fontSize:20}}>${b.price}</span></div>
             <p style={{color:"#94a3b8",fontSize:20,margin:"4px 0 6px"}}>{b.desc}</p>
-            {!owned&&(buyBundle===b.id?<div style={{display:"flex",gap:6,marginTop:4}}><input value={buyEmail} onChange={e=>setBuyEmail(e.target.value)} placeholder="Your email" onKeyDown={e=>e.key==="Enter"&&buyEmail.includes("@")&&(saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name),setToast("🎉 You're on the waitlist!"),setBuyEmail(""),setBuyBundle(null))} style={{flex:1,background:"#0f172a",border:"1px solid #475569",borderRadius:8,color:"#f1f5f9",padding:8,fontSize:20}}/><button onClick={()=>{if(buyEmail.includes("@")){saveWaitlist(buyEmail,"bundle_purchase",b.id,b.name);setToast("🎉 You're on the waitlist!");setBuyEmail("");setBuyBundle(null)}}} style={{padding:"8px 10px",borderRadius:8,border:"none",background:"#f59e0b",color:"#0f172a",fontWeight:700,fontSize:20,cursor:"pointer"}}>Join</button></div>
-            :<button onClick={()=>setBuyBundle(b.id)} style={{background:"none",border:"none",color:"#f59e0b",fontSize:20,fontWeight:600,cursor:"pointer",padding:0}}>Get Notified →</button>)}
+            {!owned&&<a href={b.url} target="_blank" rel="noopener noreferrer" onClick={()=>track("buy_link_clicked",{bundle_id:b.id,bundle_name:b.name,price:b.price})} style={{color:"#f59e0b",fontSize:20,fontWeight:600,textDecoration:"none"}}>Buy Now →</a>}
           </div>)})}
       </div>
     </div>
