@@ -546,8 +546,12 @@ export default function App(){
           commitments:[...progress.commitments,...prev.commitments.filter(c=>!progress.commitments.some(p=>p.date===c.date&&p.text===c.text))]
         }));
       }else{
+        setUserEmail(null);
         setUserName(null);
         setUserPhoto(null);
+        const defaultState={unlockedBundles:["free"],completedFrameworks:[],userResponses:{},commitments:[]};
+        setState(defaultState);
+        localStorage.setItem("aibos-state",JSON.stringify(defaultState));
       }
       setAuthLoading(false);
     });
