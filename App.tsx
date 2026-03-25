@@ -486,15 +486,15 @@ const F = [
 
 const CODES={"CC-BIZ-8K3Q":["business-domain"],"CC-PRS-2M7J":["personal-domain"],"CC-HRM-7X9K":["hormozi"],"CC-RBN-4M2P":["robbins"],"CC-SLV-5N8R":["sullivan"],"CC-FLD-3P6W":["fladlien"],"CC-KND-9Q4T":["kennedy"],"CC-BRN-6V2L":["brunson"],"CC-ALL-1A8Z":["business-domain","personal-domain","hormozi","robbins","sullivan","fladlien","kennedy","brunson"]};
 const BUNDLES=[
-{id:"business-domain",name:"Business Premium",price:37,desc:"25+ business frameworks from Hormozi, Kennedy, Brunson, Robbins.",color:"#3b82f6",url:"https://cyber-corsairs.beehiiv.com/upgrade/business-premium"},
-{id:"personal-domain",name:"Personal Premium",price:37,desc:"20+ personal frameworks from Robbins, Sullivan, Hardy.",color:"#a855f7",url:"https://cyber-corsairs.beehiiv.com/upgrade/personal-premium"},
-{id:"hormozi",name:"Hormozi Pack",price:19,desc:"All Hormozi frameworks.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/hormozi-pack"},
-{id:"robbins",name:"Robbins Pack",price:19,desc:"All Robbins frameworks.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/robbins-pack"},
-{id:"sullivan",name:"Sullivan / Hardy Pack",price:15,desc:"Future Self, 10x, Who Not How.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/sullivan-pack"},
-{id:"fladlien",name:"Fladlien Pack",price:15,desc:"Model of Reality, Persuasion, Objections.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/fladlien-pack"},
-{id:"kennedy",name:"Kennedy Pack",price:15,desc:"Market Questions, USP, Authority.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/kennedy-pack"},
-{id:"brunson",name:"Brunson Pack",price:15,desc:"Value Ladder, Expert Path, Movement.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/brunson-pack"},
-{id:"all-access",name:"All-Access Bundle",price:79,desc:"Everything. All frameworks. All future additions.",color:"#f59e0b",url:"https://cyber-corsairs.beehiiv.com/upgrade/all-access",highlight:true}
+{id:"business-domain",name:"Business Premium",price:37,desc:"25+ business frameworks from Hormozi, Kennedy, Brunson, Robbins.",color:"#3b82f6",url:"https://www.cybercorsairs.com/products/aibos-coach-business-premium"},
+{id:"personal-domain",name:"Personal Premium",price:37,desc:"20+ personal frameworks from Robbins, Sullivan, Hardy.",color:"#a855f7",url:"https://www.cybercorsairs.com/products/aibos-coach-personal-premium"},
+{id:"hormozi",name:"Hormozi Pack",price:19,desc:"All Hormozi frameworks.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/hormozi-pack"},
+{id:"robbins",name:"Robbins Pack",price:19,desc:"All Robbins frameworks.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/robbins-pack"},
+{id:"sullivan",name:"Sullivan / Hardy Pack",price:15,desc:"Future Self, 10x, Who Not How.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/sullivan-hardy-pack"},
+{id:"fladlien",name:"Fladlien Pack",price:15,desc:"Model of Reality, Persuasion, Objections.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/fladlien-pack"},
+{id:"kennedy",name:"Kennedy Pack",price:15,desc:"Market Questions, USP, Authority.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/kennedy-pack"},
+{id:"brunson",name:"Brunson Pack",price:15,desc:"Value Ladder, Expert Path, Movement.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/brunson-pack"},
+{id:"all-access",name:"All-Access Bundle",price:79,desc:"Everything. All frameworks. All future additions.",color:"#f59e0b",url:"https://www.cybercorsairs.com/products/aibos-coach-all-access-bundle",highlight:true}
 ];
 
 const initState=()=>{try{const s=JSON.parse(localStorage.getItem("aibos-state")||"null");if(s)return{...s,unlockedBundles:[...new Set(["free",...(s.unlockedBundles||[])])]}}catch{}return{unlockedBundles:["free"],completedFrameworks:[],userResponses:{},commitments:[]}};
