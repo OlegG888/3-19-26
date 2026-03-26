@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent as fbLogEvent, setUserProperties, setUserId, Analytics } from "firebase/analytics";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, Firestore } from "firebase/firestore";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut as fbSignOut, onAuthStateChanged, Auth, User } from "firebase/auth";
+import posthog from "posthog-js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARXmL7UNm7CZVZFdxz80b4WQz7IIMCO3s",
@@ -27,11 +28,20 @@ try {
   // May fail in some environments (localhost, ad blockers)
 }
 
+// PostHog
+try {
+  posthog.init("phc_c4rjrvJhCWxxzodcbMTY5vThx6CalbezuBpw4Aim78Q", {
+    api_host: "https://us.i.posthog.com",
+    autocapture: true,
+    capture_pageview: true,
+    capture_pageleave: true,
+    session_recording: { recordCrossOriginIframes: true }
+  });
+} catch (e) {}
+
 export function track(event: string, params?: Record<string, string | number | boolean>) {
-  if (!analytics) return;
-  try {
-    fbLogEvent(analytics, event, params);
-  } catch {}
+  try { fbLogEvent(analytics!, event, params); } catch {}
+  try { posthog.capture(event, params); } catch {}
 }
 
 // ─── AUTH ───
@@ -44,9 +54,9 @@ export async function signInWithGoogle(): Promise<User | null> {
     track("login", { method: "google" });
 
     // Set Analytics user
-    if (analytics && user.email) {
-      setUserId(analytics, user.email);
-      setUserProperties(analytics, { email: user.email });
+    if (user.email) {
+      try { setUserId(analytics!, user.email); setUserProperties(analytics!, { email: user.email }); } catch {}
+      try { posthog.identify(user.email, { email: user.email, name: user.displayName || "" }); } catch {}
     }
 
     // Create/update user in Firestore
@@ -86,9 +96,9 @@ export async function signInWithEmail(email: string, password: string): Promise<
     const user = result.user;
     track("login", { method: "email" });
 
-    if (analytics && user.email) {
-      setUserId(analytics, user.email);
-      setUserProperties(analytics, { email: user.email });
+    if (user.email) {
+      try { setUserId(analytics!, user.email); setUserProperties(analytics!, { email: user.email }); } catch {}
+      try { posthog.identify(user.email, { email: user.email, name: user.displayName || "" }); } catch {}
     }
 
     if (db && user.email) {
@@ -118,9 +128,9 @@ export async function signUpWithEmail(email: string, password: string, name: str
 
     track("sign_up", { method: "email" });
 
-    if (analytics && user.email) {
-      setUserId(analytics, user.email);
-      setUserProperties(analytics, { email: user.email });
+    if (user.email) {
+      try { setUserId(analytics!, user.email); setUserProperties(analytics!, { email: user.email }); } catch {}
+      try { posthog.identify(user.email, { email: user.email, name: name || "" }); } catch {}
     }
 
     if (db && user.email) {
@@ -146,6 +156,7 @@ export async function signOut(): Promise<void> {
   try {
     await fbSignOut(auth);
     track("logout");
+    try { posthog.reset(); } catch {}
   } catch {}
 }
 
@@ -227,17 +238,16 @@ export async function captureUser(): Promise<string | null> {
     window.history.replaceState({}, "", cleanUrl);
   }
 
-  if (analytics) {
-    try {
-      setUserId(analytics, email);
-      setUserProperties(analytics, {
-        email,
-        utm_source: utmSource || "(direct)",
-        utm_medium: utmMedium || "(none)",
-        utm_campaign: utmCampaign || "(none)"
-      });
-    } catch {}
-  }
+  try {
+    setUserId(analytics!, email);
+    setUserProperties(analytics!, {
+      email,
+      utm_source: utmSource || "(direct)",
+      utm_medium: utmMedium || "(none)",
+      utm_campaign: utmCampaign || "(none)"
+    });
+  } catch {}
+  try { posthog.identify(email, { email, utm_source: utmSource, utm_medium: utmMedium, utm_campaign: utmCampaign }); } catch {}
 
   if (db && urlEmail) {
     try {
